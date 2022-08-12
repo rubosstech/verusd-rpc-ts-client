@@ -1,4 +1,7 @@
-export { Uuid } from './helpers/uuid';
-import uuid from './helpers/uuid';
+import VerusdRpcInterface from "./VerusdRpcInterface";
+import * as Primitives from "verus-typescript-primitives";
 
-export default uuid;
+export {
+  VerusdRpcInterface,
+  Primitives
+}

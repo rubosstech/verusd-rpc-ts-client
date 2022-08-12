@@ -1,7 +1,7 @@
 {
-  "name": "ts-npm-package-boilerplate",
+  "name": "verusd-rpc-ts-client",
   "version": "0.1.6",
-  "description": "TypeScript NPM Module Boilerplate",
+  "description": "TypeScript rpc client module for the verusd rpc interface",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -43,5 +43,9 @@
   },
   "files": [
     "lib/**/*"
-  ]
+  ],
+  "dependencies": {
+    "axios": "^0.27.2",
+    "verus-typescript-primitives": "https://github.com/VerusCoin/verus-typescript-primitives.git"
+  }
 }
