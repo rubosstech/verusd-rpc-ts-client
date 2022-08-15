@@ -13,9 +13,9 @@ export interface RpcError<D = any> {
   data?: D;
 }
 
-export interface RpcRequestResultSuccess<T = any> {
+export interface RpcRequestResultSuccess<D = ApiPrimitive, T = any> {
   id: T;
-  result: ApiPrimitive;
+  result: D;
   error: null;
 }
 
@@ -25,5 +25,5 @@ export interface RpcRequestResultError<T = any> {
   error: RpcError;
 }
 
-export type RpcRequestResult = RpcRequestResultSuccess | RpcRequestResultError;
+export type RpcRequestResult<D = ApiPrimitive, T = any> = RpcRequestResultSuccess<D, T> | RpcRequestResultError<T>;
 

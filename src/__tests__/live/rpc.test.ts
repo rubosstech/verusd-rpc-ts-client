@@ -75,7 +75,7 @@ describe('Makes live API Verusd RPC calls', () => {
     ).toBe(null);
   });
 
-  test("getcurrency", async () => {
-    expect((await verusd.getCurrency("VRSC")).error).toBe(null);
-  });
+  // test("getcurrency", async () => {
+  //   expect((await verusd.getCurrency("VRSC")).error).toBe(null);
+  // });
 });
