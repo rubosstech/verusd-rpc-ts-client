@@ -2770,7 +2770,7 @@ v8-to-istanbul@^9.0.1:
 
 "verus-typescript-primitives@https://github.com/VerusCoin/verus-typescript-primitives.git":
   version "1.0.0"
-  resolved "https://github.com/VerusCoin/verus-typescript-primitives.git#6ccadfee6b5a056c97a05782ca66c42d220af1ef"
+  resolved "https://github.com/VerusCoin/verus-typescript-primitives.git#3b37804fcf064ff206e1a05dd5095090a424387a"
 
 walker@^1.0.8:
   version "1.0.8"

@@ -10,7 +10,8 @@ import {
   GetOffersRequest,
   GetRawTransactionRequest,
   MakeOfferRequest,
-  SendRawTransactionRequest
+  SendRawTransactionRequest,
+  GetCurrencyRequest
 } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst, RemoveFirstFromTuple } from "./types/ConstructorParametersAfterFirst";
 import { RpcRequestBody, RpcRequestResult, RpcRequestResultError } from "./types/RpcRequest";
@@ -96,6 +97,10 @@ class VerusdRpcInterface {
 
   getIdentity(...args: ConstructorParametersAfterFirst<typeof GetIdentityRequest>) {
     return this.request(new GetIdentityRequest(this.chain, ...args));
+  }
+
+  getCurrency(...args: ConstructorParametersAfterFirst<typeof GetCurrencyRequest>) {
+    return this.request(new GetCurrencyRequest(this.chain, ...args));
   }
 
   getInfo(...args: ConstructorParametersAfterFirst<typeof GetInfoRequest>) {
