@@ -1,5 +1,5 @@
 import { AxiosInstance, AxiosRequestConfig } from "axios";
-import { GetAddressBalanceRequest, ApiRequest, GetAddressDeltasRequest, GetAddressUtxosRequest, GetBlockRequest, GetIdentityRequest, GetInfoRequest, GetOffersRequest, GetRawTransactionRequest, MakeOfferRequest, SendRawTransactionRequest } from "verus-typescript-primitives";
+import { GetAddressBalanceRequest, ApiRequest, GetAddressDeltasRequest, GetAddressUtxosRequest, GetBlockRequest, GetIdentityRequest, GetInfoRequest, GetOffersRequest, GetRawTransactionRequest, MakeOfferRequest, SendRawTransactionRequest, GetCurrencyRequest } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst } from "./types/ConstructorParametersAfterFirst";
 import { RpcRequestResult } from "./types/RpcRequest";
 declare class VerusdRpcInterface {
@@ -13,6 +13,7 @@ declare class VerusdRpcInterface {
     getAddressUtxos(...args: ConstructorParametersAfterFirst<typeof GetAddressUtxosRequest>): Promise<RpcRequestResult>;
     getBlock(...args: ConstructorParametersAfterFirst<typeof GetBlockRequest>): Promise<RpcRequestResult>;
     getIdentity(...args: ConstructorParametersAfterFirst<typeof GetIdentityRequest>): Promise<RpcRequestResult>;
+    getCurrency(...args: ConstructorParametersAfterFirst<typeof GetCurrencyRequest>): Promise<RpcRequestResult>;
     getInfo(...args: ConstructorParametersAfterFirst<typeof GetInfoRequest>): Promise<RpcRequestResult>;
     getOffers(...args: ConstructorParametersAfterFirst<typeof GetOffersRequest>): Promise<RpcRequestResult>;
     getRawTransaction(...args: ConstructorParametersAfterFirst<typeof GetRawTransactionRequest>): Promise<RpcRequestResult>;
