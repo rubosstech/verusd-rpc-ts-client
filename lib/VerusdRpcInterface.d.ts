@@ -1,5 +1,5 @@
 import { AxiosInstance, AxiosRequestConfig } from "axios";
-import { GetAddressBalanceRequest, ApiRequest, GetAddressDeltasRequest, GetAddressUtxosRequest, GetBlockRequest, GetIdentityRequest, GetInfoRequest, GetOffersRequest, GetRawTransactionRequest, MakeOfferRequest, SendRawTransactionRequest, GetCurrencyRequest } from "verus-typescript-primitives";
+import { GetAddressBalanceRequest, ApiRequest, GetAddressDeltasRequest, GetAddressUtxosRequest, GetBlockRequest, GetIdentityRequest, GetInfoRequest, GetOffersRequest, GetRawTransactionRequest, MakeOfferRequest, SendRawTransactionRequest, GetCurrencyRequest, GetAddressMempoolRequest } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst } from "./types/ConstructorParametersAfterFirst";
 import { RpcRequestResult } from "./types/RpcRequest";
 declare class VerusdRpcInterface {
@@ -33,6 +33,36 @@ declare class VerusdRpcInterface {
         } | undefined;
         currencynames?: {
             [key: string]: string;
+        } | undefined;
+        sent?: {
+            outputs: {
+                addresses: string | string[];
+                amounts: {
+                    [key: string]: number;
+                };
+            }[];
+        } | undefined;
+    }[], any>>;
+    getAddressMempool(...args: ConstructorParametersAfterFirst<typeof GetAddressMempoolRequest>): Promise<RpcRequestResult<{
+        satoshis: number;
+        txid: string;
+        index: number;
+        blockindex: number;
+        height: number;
+        address: string;
+        currencyvalues?: {
+            [key: string]: number;
+        } | undefined;
+        currencynames?: {
+            [key: string]: string;
+        } | undefined;
+        sent?: {
+            outputs: {
+                addresses: string | string[];
+                amounts: {
+                    [key: string]: number;
+                };
+            }[];
         } | undefined;
     }[], any>>;
     getAddressUtxos(...args: ConstructorParametersAfterFirst<typeof GetAddressUtxosRequest>): Promise<RpcRequestResult<{

@@ -21,7 +21,9 @@ import {
   GetInfoResponse,
   GetOffersResponse,
   GetRawTransactionResponse,
-  MakeOfferResponse
+  MakeOfferResponse,
+  GetAddressMempoolRequest,
+  GetAddressMempoolResponse
 } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst, RemoveFirstFromTuple } from "./types/ConstructorParametersAfterFirst";
 import { RpcRequestBody, RpcRequestResult, RpcRequestResultError } from "./types/RpcRequest";
@@ -98,6 +100,12 @@ class VerusdRpcInterface {
   getAddressDeltas(...args: ConstructorParametersAfterFirst<typeof GetAddressDeltasRequest>) {
     return this.request<GetAddressDeltasResponse["result"]>(
       new GetAddressDeltasRequest(this.chain, ...args)
+    );
+  }
+
+  getAddressMempool(...args: ConstructorParametersAfterFirst<typeof GetAddressMempoolRequest>) {
+    return this.request<GetAddressMempoolResponse["result"]>(
+      new GetAddressMempoolRequest(this.chain, ...args)
     );
   }
 

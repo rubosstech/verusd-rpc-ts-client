@@ -37,6 +37,18 @@ describe('Makes live API Verusd RPC calls', () => {
     ).toBe(null);
   });
 
+  test('getaddressmempool', async () => {
+    expect(
+      (
+        await verusd.getAddressMempool({
+          addresses: ["mike@"],
+          friendlynames: true,
+          verbosity: 1
+        })
+      ).error
+    ).toBe(null);
+  });
+
   test("getblock", async () => {
     expect((await verusd.getBlock(1)).error).toBe(null);
   });
