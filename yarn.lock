@@ -2888,7 +2888,7 @@ v8-to-istanbul@^9.0.1:
     "@types/istanbul-lib-coverage" "^2.0.1"
     convert-source-map "^1.6.0"
 
-"verus-typescript-primitives@https://github.com/VerusCoin/verus-typescript-primitives.git":
+"verus-typescript-primitives@https://github.com/VerusCoin/verus-typescript-primitives.git#fa427373ac240a32bc6ab905ae892290bf3e6c09":
   version "1.0.0"
   resolved "https://github.com/VerusCoin/verus-typescript-primitives.git#fa427373ac240a32bc6ab905ae892290bf3e6c09"
   dependencies:
