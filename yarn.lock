@@ -2888,9 +2888,9 @@ v8-to-istanbul@^9.0.1:
     "@types/istanbul-lib-coverage" "^2.0.1"
     convert-source-map "^1.6.0"
 
-"verus-typescript-primitives@https://github.com/VerusCoin/verus-typescript-primitives.git#f6cc51ea84e3a065f50ac22e934e3b1dc21e599a":
+"verus-typescript-primitives@https://github.com/VerusCoin/verus-typescript-primitives.git#8eac2f7424938bf600ee29ae4d7f72b64d0d4b78":
   version "1.0.0"
-  resolved "https://github.com/VerusCoin/verus-typescript-primitives.git#f6cc51ea84e3a065f50ac22e934e3b1dc21e599a"
+  resolved "https://github.com/VerusCoin/verus-typescript-primitives.git#8eac2f7424938bf600ee29ae4d7f72b64d0d4b78"
   dependencies:
     "@types/bs58check" "2.1.0"
     "@types/create-hash" "1.2.2"
