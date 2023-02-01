@@ -46,6 +46,6 @@
   ],
   "dependencies": {
     "axios": "0.27.2",
-    "verus-typescript-primitives": "https://github.com/VerusCoin/verus-typescript-primitives.git#31099dcfcfc02a2d1e1588af81992a01f987ce6b"
+    "verus-typescript-primitives": "https://github.com/VerusCoin/verus-typescript-primitives.git#740827df76afb00fb9250ea2cd7dd8c79edf5c5b"
   }
 }
