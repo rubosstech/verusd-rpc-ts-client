@@ -2890,7 +2890,7 @@ v8-to-istanbul@^9.0.1:
 
 "verus-typescript-primitives@https://github.com/VerusCoin/verus-typescript-primitives.git":
   version "1.0.0"
-  resolved "https://github.com/VerusCoin/verus-typescript-primitives.git#d151fd70ca21b4100e4e4bc55945483ffeb787e4"
+  resolved "https://github.com/VerusCoin/verus-typescript-primitives.git#23b0ef2490a25f7e751e776e4edba3f2f14ab4d1"
   dependencies:
     "@types/bs58check" "2.1.0"
     "@types/create-hash" "1.2.2"
