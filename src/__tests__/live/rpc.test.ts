@@ -1,7 +1,7 @@
 import { VerusdRpcInterface } from '../../index'
 
 describe('Makes live API Verusd RPC calls', () => {
-  const verusd = new VerusdRpcInterface("VRSCTEST", "https://api.verus.services")
+  const verusd = new VerusdRpcInterface("VRSCTEST", "https://api.verustest.net/")
 
   test('getaddressbalance', async () => {
     expect(
@@ -81,13 +81,17 @@ describe('Makes live API Verusd RPC calls', () => {
     expect(
       (
         await verusd.getRawTransaction(
-          "319018d7a7c31613f7d5d9579a4f5b265b1c6ea01898251b314111e099ec80f1"
+          "676ccef766d808a3e7ab60a32226273a15bbce300db6ebea3b944b65043655cf"
         )
       ).error
     ).toBe(null);
   });
 
-  // test("getcurrency", async () => {
-  //   expect((await verusd.getCurrency("VRSC")).error).toBe(null);
-  // });
+  test("getcurrency", async () => {
+    expect((await verusd.getCurrency("VRSCTEST")).error).toBe(null);
+  });
+
+  test("getvdxfid", async () => {
+    expect((await verusd.getVdxfId("test")).error).toBe(null);
+  });
 });

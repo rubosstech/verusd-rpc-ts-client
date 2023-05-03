@@ -23,7 +23,9 @@ import {
   GetRawTransactionResponse,
   MakeOfferResponse,
   GetAddressMempoolRequest,
-  GetAddressMempoolResponse
+  GetAddressMempoolResponse,
+  GetVdxfIdRequest,
+  GetVdxfIdResponse
 } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst, RemoveFirstFromTuple } from "./types/ConstructorParametersAfterFirst";
 import { RpcRequestBody, RpcRequestResult, RpcRequestResultError } from "./types/RpcRequest";
@@ -117,6 +119,10 @@ class VerusdRpcInterface {
 
   getBlock(...args: ConstructorParametersAfterFirst<typeof GetBlockRequest>) {
     return this.request<GetBlockResponse["result"]>(new GetBlockRequest(this.chain, ...args));
+  }
+
+  getVdxfId(...args: ConstructorParametersAfterFirst<typeof GetVdxfIdRequest>) {
+    return this.request<GetVdxfIdResponse["result"]>(new GetVdxfIdRequest(this.chain, ...args));
   }
 
   getIdentity(...args: ConstructorParametersAfterFirst<typeof GetIdentityRequest>) {
