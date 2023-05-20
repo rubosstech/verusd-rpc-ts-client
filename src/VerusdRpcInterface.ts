@@ -25,7 +25,11 @@ import {
   GetAddressMempoolRequest,
   GetAddressMempoolResponse,
   GetVdxfIdRequest,
-  GetVdxfIdResponse
+  GetVdxfIdResponse,
+  FundRawTransactionRequest,
+  FundRawTransactionResponse,
+  SendCurrencyRequest,
+  SendCurrencyResponse
 } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst, RemoveFirstFromTuple } from "./types/ConstructorParametersAfterFirst";
 import { RpcRequestBody, RpcRequestResult, RpcRequestResultError } from "./types/RpcRequest";
@@ -154,6 +158,18 @@ class VerusdRpcInterface {
   sendRawTransaction(...args: ConstructorParametersAfterFirst<typeof SendRawTransactionRequest>) {
     return this.request<GetRawTransactionResponse["result"]>(
       new SendRawTransactionRequest(this.chain, ...args)
+    );
+  }
+
+  fundRawTransaction(...args: ConstructorParametersAfterFirst<typeof FundRawTransactionRequest>) {
+    return this.request<FundRawTransactionResponse["result"]>(
+      new FundRawTransactionRequest(this.chain, ...args)
+    );
+  }
+
+  sendCurrency(...args: ConstructorParametersAfterFirst<typeof SendCurrencyRequest>) {
+    return this.request<SendCurrencyResponse["result"]>(
+      new SendCurrencyRequest(this.chain, ...args)
     );
   }
 }
