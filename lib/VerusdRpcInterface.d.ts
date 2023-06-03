@@ -1,5 +1,5 @@
 import { AxiosInstance, AxiosRequestConfig } from "axios";
-import { GetAddressBalanceRequest, ApiRequest, GetAddressDeltasRequest, GetAddressUtxosRequest, GetBlockRequest, GetIdentityRequest, GetInfoRequest, GetOffersRequest, GetRawTransactionRequest, MakeOfferRequest, SendRawTransactionRequest, GetCurrencyRequest, GetAddressMempoolRequest, GetVdxfIdRequest, FundRawTransactionRequest, SendCurrencyRequest } from "verus-typescript-primitives";
+import { GetAddressBalanceRequest, ApiRequest, GetAddressDeltasRequest, GetAddressUtxosRequest, GetBlockRequest, GetIdentityRequest, GetInfoRequest, GetOffersRequest, GetRawTransactionRequest, MakeOfferRequest, SendRawTransactionRequest, GetCurrencyRequest, GetAddressMempoolRequest, GetVdxfIdRequest, FundRawTransactionRequest, SendCurrencyRequest, GetCurrencyConvertersRequest } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst } from "./types/ConstructorParametersAfterFirst";
 import { RpcRequestResult } from "./types/RpcRequest";
 declare class VerusdRpcInterface {
@@ -96,7 +96,7 @@ declare class VerusdRpcInterface {
         } | undefined;
     }, any>>;
     getIdentity(...args: ConstructorParametersAfterFirst<typeof GetIdentityRequest>): Promise<RpcRequestResult<{
-        identity: import("verus-typescript-primitives/dist/identity/IdentityDefinition").IdentityDefinition;
+        identity: import("verus-typescript-primitives").IdentityDefinition;
         status: string;
         canspendfor: boolean;
         cansignfor: boolean;
@@ -105,97 +105,7 @@ declare class VerusdRpcInterface {
         vout: number;
         proof?: string | undefined;
     }, any>>;
-    getCurrency(...args: ConstructorParametersAfterFirst<typeof GetCurrencyRequest>): Promise<RpcRequestResult<{
-        version: number;
-        options: number;
-        name: string;
-        currencyid: string;
-        parent: string;
-        systemid: string;
-        notarizationprotocol: number;
-        proofprotocol: number;
-        launchsystemid: string;
-        startblock: number;
-        endblock: number;
-        currencies: [string];
-        weights: number[];
-        conversions: number[];
-        initialsupply: number;
-        prelaunchcarveout: number;
-        initialcontributions: number[];
-        idregistrationfees: number;
-        idreferrallevels: number;
-        idimportfees: number;
-        currencyidhex: string;
-        fullyqualifiedname: string;
-        currencynames: {
-            [key: string]: string;
-        };
-        definitiontxid: string;
-        definitiontxout: number;
-        bestheight: number;
-        lastconfirmedheight: number;
-        bestcurrencystate?: {
-            flags: number;
-            version: number;
-            currencyid: string;
-            reservecurrencies: {
-                currencyid: string;
-                weight: number;
-                reserves: number;
-                priceinreserve: number;
-            }[];
-            initialsupply: number;
-            emitted: number;
-            supply: number;
-            currencies: {
-                [key: string]: {
-                    reservein: number;
-                    primarycurrencyin: number;
-                    reserveout: number;
-                    lastconversionprice: number;
-                    viaconversionprice: number;
-                    fees: number;
-                    conversionfees: number;
-                    priorweights: number;
-                };
-            };
-            primarycurrencyfees: number;
-            primarycurrencyconversionfees: number;
-            primarycurrencyout: number;
-            preconvertedout: number;
-        } | undefined;
-        lastconfirmedcurrencystate?: {
-            flags: number;
-            version: number;
-            currencyid: string;
-            reservecurrencies: {
-                currencyid: string;
-                weight: number;
-                reserves: number;
-                priceinreserve: number;
-            }[];
-            initialsupply: number;
-            emitted: number;
-            supply: number;
-            currencies: {
-                [key: string]: {
-                    reservein: number;
-                    primarycurrencyin: number;
-                    reserveout: number;
-                    lastconversionprice: number;
-                    viaconversionprice: number;
-                    fees: number;
-                    conversionfees: number;
-                    priorweights: number;
-                };
-            };
-            primarycurrencyfees: number;
-            primarycurrencyconversionfees: number;
-            primarycurrencyout: number;
-            preconvertedout: number;
-        } | undefined;
-    }, any>>;
+    getCurrency(...args: ConstructorParametersAfterFirst<typeof GetCurrencyRequest>): Promise<RpcRequestResult<import("verus-typescript-primitives").CurrencyDefinition, any>>;
     getInfo(...args: ConstructorParametersAfterFirst<typeof GetInfoRequest>): Promise<RpcRequestResult<{
         version: number;
         protocolversion: number;
@@ -250,5 +160,8 @@ declare class VerusdRpcInterface {
         feeamount: number;
         hextx: string;
     }, any>>;
+    getCurrencyConverters(...args: ConstructorParametersAfterFirst<typeof GetCurrencyConvertersRequest>): Promise<RpcRequestResult<{
+        [key: string]: import("verus-typescript-primitives").CurrencyDefinition;
+    }[], any>>;
 }
 export default VerusdRpcInterface;

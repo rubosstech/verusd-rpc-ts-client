@@ -94,4 +94,8 @@ describe('Makes live API Verusd RPC calls', () => {
   test("getvdxfid", async () => {
     expect((await verusd.getVdxfId("test")).error).toBe(null);
   });
+
+  test("getcurrencyconverters", async () => {
+    expect((await verusd.getCurrencyConverters(["VRSCTEST"])).error).toBe(null);
+  });
 });

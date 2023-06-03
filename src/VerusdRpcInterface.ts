@@ -29,7 +29,9 @@ import {
   FundRawTransactionRequest,
   FundRawTransactionResponse,
   SendCurrencyRequest,
-  SendCurrencyResponse
+  SendCurrencyResponse,
+  GetCurrencyConvertersRequest,
+  GetCurrencyConvertersResponse
 } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst, RemoveFirstFromTuple } from "./types/ConstructorParametersAfterFirst";
 import { RpcRequestBody, RpcRequestResult, RpcRequestResultError } from "./types/RpcRequest";
@@ -170,6 +172,12 @@ class VerusdRpcInterface {
   sendCurrency(...args: ConstructorParametersAfterFirst<typeof SendCurrencyRequest>) {
     return this.request<SendCurrencyResponse["result"]>(
       new SendCurrencyRequest(this.chain, ...args)
+    );
+  }
+
+  getCurrencyConverters(...args: ConstructorParametersAfterFirst<typeof GetCurrencyConvertersRequest>) {
+    return this.request<GetCurrencyConvertersResponse["result"]>(
+      new GetCurrencyConvertersRequest(this.chain, ...args)
     );
   }
 }
