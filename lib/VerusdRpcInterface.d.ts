@@ -1,11 +1,26 @@
 import { AxiosInstance, AxiosRequestConfig } from "axios";
-import { GetAddressBalanceRequest, ApiRequest, GetAddressDeltasRequest, GetAddressUtxosRequest, GetBlockRequest, GetIdentityRequest, GetInfoRequest, GetOffersRequest, GetRawTransactionRequest, MakeOfferRequest, SendRawTransactionRequest, GetCurrencyRequest, GetAddressMempoolRequest, GetVdxfIdRequest, FundRawTransactionRequest, SendCurrencyRequest, GetCurrencyConvertersRequest } from "verus-typescript-primitives";
+import { GetAddressBalanceRequest, ApiRequest, GetAddressDeltasRequest, GetAddressUtxosRequest, GetBlockRequest, GetIdentityRequest, GetInfoRequest, GetOffersRequest, GetRawTransactionRequest, MakeOfferRequest, SendRawTransactionRequest, GetCurrencyRequest, GetAddressMempoolRequest, GetVdxfIdRequest, FundRawTransactionRequest, SendCurrencyRequest, GetCurrencyConvertersRequest, CurrencyDefinition, ApiResponse, ListCurrenciesRequest } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst } from "./types/ConstructorParametersAfterFirst";
 import { RpcRequestResult } from "./types/RpcRequest";
+declare type Convertable = {
+    via?: CurrencyDefinition;
+    destination: CurrencyDefinition;
+    exportto?: string;
+    price: number;
+    viapriceinroot?: number;
+    destpriceinvia?: number;
+    gateway: boolean;
+};
+declare type Convertables = {
+    [key: string]: Array<Convertable>;
+};
 declare class VerusdRpcInterface {
     instance: AxiosInstance;
     currid: number;
     chain: string;
+    private currencycache;
+    private converterscache;
+    private listcurrenciescache;
     constructor(chain: string, baseURL: string, config?: AxiosRequestConfig);
     request<D>(req: ApiRequest): Promise<RpcRequestResult<D>>;
     getAddressBalance(...args: ConstructorParametersAfterFirst<typeof GetAddressBalanceRequest>): Promise<RpcRequestResult<{
@@ -105,7 +120,7 @@ declare class VerusdRpcInterface {
         vout: number;
         proof?: string | undefined;
     }, any>>;
-    getCurrency(...args: ConstructorParametersAfterFirst<typeof GetCurrencyRequest>): Promise<RpcRequestResult<import("verus-typescript-primitives").CurrencyDefinition, any>>;
+    getCurrency(...args: ConstructorParametersAfterFirst<typeof GetCurrencyRequest>): Promise<RpcRequestResult<CurrencyDefinition, any>>;
     getInfo(...args: ConstructorParametersAfterFirst<typeof GetInfoRequest>): Promise<RpcRequestResult<{
         version: number;
         protocolversion: number;
@@ -161,7 +176,51 @@ declare class VerusdRpcInterface {
         hextx: string;
     }, any>>;
     getCurrencyConverters(...args: ConstructorParametersAfterFirst<typeof GetCurrencyConvertersRequest>): Promise<RpcRequestResult<{
-        [key: string]: import("verus-typescript-primitives").CurrencyDefinition;
+        [key: string]: CurrencyDefinition;
     }[], any>>;
+    listCurrencies(...args: ConstructorParametersAfterFirst<typeof ListCurrenciesRequest>): Promise<RpcRequestResult<{
+        currencydefinition: CurrencyDefinition;
+        bestheight?: number | undefined;
+        besttxid?: string | undefined;
+        besttxout?: number | undefined;
+        bestcurrencystate?: {
+            flags: number;
+            version: number;
+            currencyid: string;
+            reservecurrencies: {
+                currencyid: string;
+                weight: number;
+                reserves: number;
+                priceinreserve: number;
+            }[];
+            initialsupply: number;
+            emitted: number;
+            supply: number;
+            currencies: {
+                [key: string]: {
+                    reservein: number;
+                    primarycurrencyin: number;
+                    reserveout: number;
+                    lastconversionprice: number;
+                    viaconversionprice: number;
+                    fees: number;
+                    conversionfees: number;
+                    priorweights: number;
+                };
+            };
+            primarycurrencyfees: number;
+            primarycurrencyconversionfees: number;
+            primarycurrencyout: number;
+            preconvertedout: number;
+        } | undefined;
+    }[], any>>;
+    static extractRpcResult<D extends ApiResponse>(res: RpcRequestResult<D["result"]>): D["result"];
+    private getCachedCurrency;
+    private getCachedListCurrencies;
+    private getAllCachedListCurrencies;
+    private getCachedCurrencyConverters;
+    private getCurrencyConversionPathsRec;
+    private _getCurrencyConversionPaths;
+    getCurrencyConversionPaths(src: CurrencyDefinition, dest?: CurrencyDefinition, includeVia?: boolean, ignoreCurrencies?: Array<string>, via?: CurrencyDefinition, root?: CurrencyDefinition): Promise<Convertables>;
 }
 export default VerusdRpcInterface;

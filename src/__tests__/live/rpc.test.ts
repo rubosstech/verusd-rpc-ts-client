@@ -1,7 +1,9 @@
 import { VerusdRpcInterface } from '../../index'
 
+jest.setTimeout(10000)
+
 describe('Makes live API Verusd RPC calls', () => {
-  const verusd = new VerusdRpcInterface("VRSCTEST", "https://api.verustest.net/")
+  const verusd = new VerusdRpcInterface("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq", "https://api.verustest.net/")
 
   test('getaddressbalance', async () => {
     expect(
@@ -97,5 +99,16 @@ describe('Makes live API Verusd RPC calls', () => {
 
   test("getcurrencyconverters", async () => {
     expect((await verusd.getCurrencyConverters(["VRSCTEST"])).error).toBe(null);
+  });
+
+  test("listcurrencies", async () => {
+    expect((await verusd.listCurrencies()).error).toBe(null);
+  });
+
+  test("getcurrencyconversionpaths", async () => {
+    const VRSCTEST = (await verusd.getCurrency("VRSCTEST")).result
+    const paths = await verusd.getCurrencyConversionPaths(VRSCTEST!)
+
+    expect(paths).toBeDefined()
   });
 });
