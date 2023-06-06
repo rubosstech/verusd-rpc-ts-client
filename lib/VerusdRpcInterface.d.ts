@@ -5,7 +5,7 @@ import { RpcRequestResult } from "./types/RpcRequest";
 declare type Convertable = {
     via?: CurrencyDefinition;
     destination: CurrencyDefinition;
-    exportto?: string;
+    exportto?: CurrencyDefinition;
     price: number;
     viapriceinroot?: number;
     destpriceinvia?: number;

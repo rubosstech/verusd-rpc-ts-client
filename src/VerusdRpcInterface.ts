@@ -44,7 +44,7 @@ import { IS_FRACTIONAL_FLAG, IS_GATEWAY_FLAG, checkFlag } from "./utils/flags";
 type Convertable = {
   via?: CurrencyDefinition,
   destination: CurrencyDefinition,
-  exportto?: string,
+  exportto?: CurrencyDefinition,
   price: number,
   viapriceinroot?: number,
   destpriceinvia?: number,
@@ -417,15 +417,15 @@ class VerusdRpcInterface {
           name: displayName,
         },
         exportto: gateway
-          ? path[currencyName].currencyid
+          ? path[currencyName]
           : (via == null && path[currencyName].systemid === src.systemid) ||
             (via != null && via.systemid === root!.systemid)
           ? undefined
           : via == null
-          ? path[currencyName].currencyid
+          ? path[currencyName]
           : via.systemid === root!.systemid
           ? undefined
-          : via.systemid,
+          : via,
         price,
         gateway,
         viapriceinroot,
@@ -500,15 +500,15 @@ class VerusdRpcInterface {
             via,
             destination: _destination,
             exportto: gateway
-              ? _destination.currencyid
+              ? _destination
               : (via == null && _destination.systemid === src.systemid) ||
                 (via != null && via.systemid === root!.systemid)
               ? undefined
               : via == null
-              ? _destination.currencyid
+              ? _destination
               : via.systemid === root!.systemid
               ? undefined
-              : via.systemid,
+              : via,
             price,
             viapriceinroot,
             destpriceinvia,
