@@ -367,7 +367,9 @@ class VerusdRpcInterface {
 
     destination_iterator: for (const path of paths) {
       const currencyName = Object.keys(path)[0];
-      const displayName = path[currencyName].fullyqualifiedname
+      const fullCurrencyDefinition = (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
+        await this.getCachedCurrency(path[currencyName].currencyid)
+      ))
 
       let pricingCurrencyState;
       let price;
@@ -385,44 +387,41 @@ class VerusdRpcInterface {
 
         // If the pricingCurrency doesn't contain the destination
         // in it's reserves, we can't use it for via
-        if (pricingCurrencyState.currencies[path[currencyName].currencyid] == null) {
+        if (pricingCurrencyState.currencies[fullCurrencyDefinition.currencyid] == null) {
           continue;
         }
 
         viapriceinroot = 1 / pricingCurrencyState.currencies[root!.currencyid].lastconversionprice
-        destpriceinvia = pricingCurrencyState.currencies[path[currencyName].currencyid].lastconversionprice
+        destpriceinvia = pricingCurrencyState.currencies[fullCurrencyDefinition.currencyid].lastconversionprice
         price =
           1 /
           (pricingCurrencyState.currencies[root!.currencyid].lastconversionprice /
-            pricingCurrencyState.currencies[path[currencyName].currencyid]
+            pricingCurrencyState.currencies[fullCurrencyDefinition.currencyid]
               .lastconversionprice);
       } else {
-        if (path[currencyName].bestcurrencystate) {
-          pricingCurrencyState = path[currencyName].bestcurrencystate;
+        if (fullCurrencyDefinition.bestcurrencystate) {
+          pricingCurrencyState = fullCurrencyDefinition.bestcurrencystate;
         } else {
           pricingCurrencyState = (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
-            await this.getCachedCurrency(path[currencyName].currencyid)
+            await this.getCachedCurrency(fullCurrencyDefinition.currencyid)
           )).bestcurrencystate!
         }
 
         price = 1 / pricingCurrencyState!.currencies[src.currencyid].lastconversionprice;
       }
 
-      const gateway = checkFlag(path[currencyName].options, IS_GATEWAY_FLAG)
+      const gateway = checkFlag(fullCurrencyDefinition.options, IS_GATEWAY_FLAG)
 
-      addConvertable(path[currencyName].currencyid, {
+      addConvertable(fullCurrencyDefinition.currencyid, {
         via,
-        destination: {
-          ...path[currencyName],
-          name: displayName,
-        },
+        destination: fullCurrencyDefinition,
         exportto: gateway
-          ? path[currencyName]
-          : (via == null && path[currencyName].systemid === src.systemid) ||
+          ? fullCurrencyDefinition
+          : (via == null && fullCurrencyDefinition.systemid === src.systemid) ||
             (via != null && via.systemid === root!.systemid)
           ? undefined
           : via == null
-          ? path[currencyName]
+          ? fullCurrencyDefinition
           : via.systemid === root!.systemid
           ? undefined
           : via,
@@ -434,12 +433,9 @@ class VerusdRpcInterface {
 
       // If gateway converter, allow converting to same currency, on current system
       if (gateway) {
-        addConvertable(path[currencyName].currencyid, {
+        addConvertable(fullCurrencyDefinition.currencyid, {
           via,
-          destination: {
-            ...path[currencyName],
-            name: displayName,
-          },
+          destination: fullCurrencyDefinition,
           price,
           gateway: false,
           viapriceinroot,
