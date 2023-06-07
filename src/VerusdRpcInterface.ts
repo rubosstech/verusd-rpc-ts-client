@@ -416,15 +416,21 @@ class VerusdRpcInterface {
         via,
         destination: fullCurrencyDefinition,
         exportto: gateway
-          ? fullCurrencyDefinition
+          ? (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
+            await this.getCachedCurrency(fullCurrencyDefinition.systemid)
+          ))
           : (via == null && fullCurrencyDefinition.systemid === src.systemid) ||
             (via != null && via.systemid === root!.systemid)
           ? undefined
           : via == null
-          ? fullCurrencyDefinition
+          ? (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
+            await this.getCachedCurrency(fullCurrencyDefinition.systemid)
+          ))
           : via.systemid === root!.systemid
           ? undefined
-          : via,
+          : (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
+            await this.getCachedCurrency(via.systemid)
+          )),
         price,
         gateway,
         viapriceinroot,
@@ -496,15 +502,21 @@ class VerusdRpcInterface {
             via,
             destination: _destination,
             exportto: gateway
-              ? _destination
+              ? (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
+                await this.getCachedCurrency(_destination.systemid)
+              ))
               : (via == null && _destination.systemid === src.systemid) ||
                 (via != null && via.systemid === root!.systemid)
               ? undefined
               : via == null
-              ? _destination
+              ? (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
+                await this.getCachedCurrency(_destination.systemid)
+              ))
               : via.systemid === root!.systemid
               ? undefined
-              : via,
+              : (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
+                await this.getCachedCurrency(via.systemid)
+              )),
             price,
             viapriceinroot,
             destpriceinvia,
