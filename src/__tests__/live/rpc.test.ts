@@ -3,7 +3,7 @@ import { VerusdRpcInterface } from '../../index'
 jest.setTimeout(10000)
 
 describe('Makes live API Verusd RPC calls', () => {
-  const verusd = new VerusdRpcInterface("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq", "https://api.verustest.net/")
+  const verusd = new VerusdRpcInterface("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq", "http://127.0.0.1:8000")
 
   test('getaddressbalance', async () => {
     expect(
@@ -13,7 +13,7 @@ describe('Makes live API Verusd RPC calls', () => {
           friendlynames: true,
         })
       ).error
-    ).toBe(null);
+    ).toBe(undefined);
   });
 
   test('getaddressutxos', async () => {
@@ -24,7 +24,7 @@ describe('Makes live API Verusd RPC calls', () => {
           friendlynames: true
         })
       ).error
-    ).toBe(null);
+    ).toBe(undefined);
   });
 
   test('getaddressdeltas', async () => {
@@ -36,7 +36,7 @@ describe('Makes live API Verusd RPC calls', () => {
           verbosity: 1
         })
       ).error
-    ).toBe(null);
+    ).toBe(undefined);
   });
 
   test('getaddressmempool', async () => {
@@ -48,11 +48,11 @@ describe('Makes live API Verusd RPC calls', () => {
           verbosity: 1
         })
       ).error
-    ).toBe(null);
+    ).toBe(undefined);
   });
 
   test("getblock", async () => {
-    expect((await verusd.getBlock(1)).error).toBe(null);
+    expect((await verusd.getBlock("1")).error).toBe(undefined);
   });
 
   test('getidentity', async () => {
@@ -60,7 +60,7 @@ describe('Makes live API Verusd RPC calls', () => {
       (
         await verusd.getIdentity("mike@")
       ).error
-    ).toBe(null);
+    ).toBe(undefined);
   });
 
   test('getinfo', async () => {
@@ -68,7 +68,7 @@ describe('Makes live API Verusd RPC calls', () => {
       (
         await verusd.getInfo()
       ).error
-    ).toBe(null);
+    ).toBe(undefined);
   });
 
   test('getoffers', async () => {
@@ -76,7 +76,7 @@ describe('Makes live API Verusd RPC calls', () => {
       (
         await verusd.getOffers("mike@")
       ).error
-    ).toBe(null);
+    ).toBe(undefined);
   });
 
   test('getrawtransaction', async () => {
@@ -86,23 +86,23 @@ describe('Makes live API Verusd RPC calls', () => {
           "676ccef766d808a3e7ab60a32226273a15bbce300db6ebea3b944b65043655cf"
         )
       ).error
-    ).toBe(null);
+    ).toBe(undefined);
   });
 
   test("getcurrency", async () => {
-    expect((await verusd.getCurrency("VRSCTEST")).error).toBe(null);
+    expect((await verusd.getCurrency("VRSCTEST")).error).toBe(undefined);
   });
 
   test("getvdxfid", async () => {
-    expect((await verusd.getVdxfId("test")).error).toBe(null);
+    expect((await verusd.getVdxfId("test")).error).toBe(undefined);
   });
 
   test("getcurrencyconverters", async () => {
-    expect((await verusd.getCurrencyConverters(["VRSCTEST"])).error).toBe(null);
+    expect((await verusd.getCurrencyConverters(["VRSCTEST"])).error).toBe(undefined);
   });
 
   test("listcurrencies", async () => {
-    expect((await verusd.listCurrencies()).error).toBe(null);
+    expect((await verusd.listCurrencies()).error).toBe(undefined);
   });
 
   test("getcurrencyconversionpaths", async () => {
