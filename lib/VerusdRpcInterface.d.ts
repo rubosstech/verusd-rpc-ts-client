@@ -1,5 +1,5 @@
 import { AxiosInstance, AxiosRequestConfig } from "axios";
-import { GetAddressBalanceRequest, ApiRequest, GetAddressDeltasRequest, GetAddressUtxosRequest, GetBlockRequest, GetIdentityRequest, GetInfoRequest, GetOffersRequest, GetRawTransactionRequest, MakeOfferRequest, SendRawTransactionRequest, GetCurrencyRequest, GetAddressMempoolRequest, GetVdxfIdRequest, FundRawTransactionRequest, SendCurrencyRequest, GetCurrencyConvertersRequest, CurrencyDefinition, ApiResponse, ListCurrenciesRequest } from "verus-typescript-primitives";
+import { GetAddressBalanceRequest, ApiRequest, GetAddressDeltasRequest, GetAddressUtxosRequest, GetBlockRequest, GetIdentityRequest, GetInfoRequest, GetOffersRequest, GetRawTransactionRequest, MakeOfferRequest, SendRawTransactionRequest, GetCurrencyRequest, GetAddressMempoolRequest, GetVdxfIdRequest, FundRawTransactionRequest, SendCurrencyRequest, GetCurrencyConvertersRequest, CurrencyDefinition, ApiResponse, ListCurrenciesRequest, EstimateConversionRequest } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst } from "./types/ConstructorParametersAfterFirst";
 import { RpcRequestResult } from "./types/RpcRequest";
 declare type Convertable = {
@@ -214,6 +214,42 @@ declare class VerusdRpcInterface {
             preconvertedout: number;
         } | undefined;
     }[], any>>;
+    estimateConversion(...args: ConstructorParametersAfterFirst<typeof EstimateConversionRequest>): Promise<RpcRequestResult<{
+        estimatedcurrencyout: number;
+        inputcurrencyid: string;
+        netinputamount: number;
+        outputcurrencyid: string;
+        estimatedcurrencystate: {
+            currencies: {
+                [currencyid: string]: {
+                    conversionfees: number;
+                    fees: number;
+                    lastconversionprice: number;
+                    primarycurrencyin: number;
+                    priorweights: number;
+                    reservein: number;
+                    reserveout: number;
+                    viaconversionprice: number;
+                };
+            };
+            currencyid: string;
+            emitted: number;
+            flags: number;
+            initialsupply: number;
+            preconvertedout: number;
+            primarycurrencyconversionfees: number;
+            primarycurrencyfees: number;
+            primarycurrencyout: number;
+            reservecurrencies: {
+                currencyid: string;
+                priceinreserve: number;
+                reserves: number;
+                weight: number;
+            }[];
+            supply: number;
+            version: number;
+        };
+    }, any>>;
     static extractRpcResult<D extends ApiResponse>(res: RpcRequestResult<D["result"]>): D["result"];
     private getCachedCurrency;
     private getCachedListCurrencies;

@@ -105,6 +105,15 @@ describe('Makes live API Verusd RPC calls', () => {
     expect((await verusd.listCurrencies()).error).toBe(undefined);
   });
 
+  test("estimateconversion", async () => {
+    expect((await verusd.estimateConversion({
+      "currency": "BrandDisc", 
+      "convertto": "brand32", 
+      "via": "BrandWeight", 
+      "amount": 10
+    })).error).toBe(undefined);
+  });
+
   test("getcurrencyconversionpaths", async () => {
     const VRSCTEST = (await verusd.getCurrency("VRSCTEST")).result
     const paths = await verusd.getCurrencyConversionPaths(VRSCTEST!)

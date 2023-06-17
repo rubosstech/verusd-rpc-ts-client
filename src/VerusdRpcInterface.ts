@@ -35,7 +35,9 @@ import {
   CurrencyDefinition,
   ApiResponse,
   ListCurrenciesRequest,
-  ListCurrenciesResponse
+  ListCurrenciesResponse,
+  EstimateConversionRequest,
+  EstimateConversionResponse
 } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst, RemoveFirstFromTuple } from "./types/ConstructorParametersAfterFirst";
 import { RpcRequestBody, RpcRequestResult, RpcRequestResultError, RpcRequestResultSuccess } from "./types/RpcRequest";
@@ -205,6 +207,12 @@ class VerusdRpcInterface {
   listCurrencies(...args: ConstructorParametersAfterFirst<typeof ListCurrenciesRequest>) {
     return this.request<ListCurrenciesResponse["result"]>(
       new ListCurrenciesRequest(this.chain, ...args)
+    );
+  }
+
+  estimateConversion(...args: ConstructorParametersAfterFirst<typeof EstimateConversionRequest>) {
+    return this.request<EstimateConversionResponse["result"]>(
+      new EstimateConversionRequest(this.chain, ...args)
     );
   }
 
