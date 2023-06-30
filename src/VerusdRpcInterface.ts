@@ -41,7 +41,7 @@ import {
 } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst, RemoveFirstFromTuple } from "./types/ConstructorParametersAfterFirst";
 import { RpcRequestBody, RpcRequestResult, RpcRequestResultError, RpcRequestResultSuccess } from "./types/RpcRequest";
-import { IS_FRACTIONAL_FLAG, IS_GATEWAY_FLAG, checkFlag } from "./utils/flags";
+import { IS_FRACTIONAL_FLAG, IS_GATEWAY_CONVERTER_FLAG, IS_GATEWAY_FLAG, checkFlag } from "./utils/flags";
 
 type Convertable = {
   via?: CurrencyDefinition,
@@ -358,7 +358,15 @@ class VerusdRpcInterface {
 
       for (const key in x) {
         if (y[key]) {
-          merged[key] = [...x[key], ...y[key]]
+          merged[key] = x[key]
+
+          for (const conv of y[key]) {
+            const existingConvertable = x[key].find(x => {
+              return x.destination === conv.destination && x.via === conv.via && x.exportto === conv.exportto
+            })
+
+            if (existingConvertable == null) merged[key].push(conv)
+          }
         } else {
           merged[key] = x[key]
         }
@@ -418,27 +426,21 @@ class VerusdRpcInterface {
         price = 1 / pricingCurrencyState!.currencies[src.currencyid].lastconversionprice;
       }
 
-      const gateway = checkFlag(fullCurrencyDefinition.options, IS_GATEWAY_FLAG)
+      const gateway = checkFlag(fullCurrencyDefinition.options, IS_GATEWAY_FLAG);
+
+      const gatewayConverter = fullCurrencyDefinition.systemid !== this.chain && 
+                      (checkFlag(fullCurrencyDefinition.options, IS_GATEWAY_CONVERTER_FLAG) || 
+                      (via != null && checkFlag(via.options, IS_GATEWAY_CONVERTER_FLAG)))
 
       addConvertable(fullCurrencyDefinition.currencyid, {
         via,
         destination: fullCurrencyDefinition,
-        exportto: gateway
-          ? (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
+        exportto: (gateway || gatewayConverter) ? 
+          (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
             await this.getCachedCurrency(fullCurrencyDefinition.systemid)
           ))
-          : (via == null && fullCurrencyDefinition.systemid === src.systemid) ||
-            (via != null && via.systemid === root!.systemid)
-          ? undefined
-          : via == null
-          ? (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
-            await this.getCachedCurrency(fullCurrencyDefinition.systemid)
-          ))
-          : via.systemid === root!.systemid
-          ? undefined
-          : (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
-            await this.getCachedCurrency(via.systemid)
-          )),
+          : 
+          undefined,
         price,
         gateway,
         viapriceinroot,
@@ -446,15 +448,23 @@ class VerusdRpcInterface {
       })
 
       // If gateway converter, allow converting to same currency, on current system
-      if (gateway) {
-        addConvertable(fullCurrencyDefinition.currencyid, {
-          via,
-          destination: fullCurrencyDefinition,
-          price,
-          gateway: false,
-          viapriceinroot,
-          destpriceinvia
-        })
+      if (gateway || gatewayConverter) {
+        const convertableArr = convertables[fullCurrencyDefinition.currencyid];
+        const existingOnChainConversion = convertableArr != null ? 
+          convertableArr.find(x => x.exportto == null) 
+          : 
+          null
+        
+        if (existingOnChainConversion == null) {
+          addConvertable(fullCurrencyDefinition.currencyid, {
+            via,
+            destination: fullCurrencyDefinition,
+            price,
+            gateway: false,
+            viapriceinroot,
+            destpriceinvia
+          })
+        }
       }
     }
 
@@ -504,27 +514,21 @@ class VerusdRpcInterface {
             await this.getCachedCurrency(reserve)
           ))
 
-          const gateway = checkFlag(_destination.options, IS_GATEWAY_FLAG)
+          const gateway = checkFlag(_destination.options, IS_GATEWAY_FLAG);
+
+          const gatewayConverter = _destination.systemid !== this.chain &&  
+                          (checkFlag(_destination.options, IS_GATEWAY_CONVERTER_FLAG) || 
+                          (via != null && checkFlag(via.options, IS_GATEWAY_CONVERTER_FLAG)))
 
           addConvertable(reserve, {
             via,
             destination: _destination,
-            exportto: gateway
-              ? (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
+            exportto: (gateway || gatewayConverter) ? 
+              (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
                 await this.getCachedCurrency(_destination.systemid)
               ))
-              : (via == null && _destination.systemid === src.systemid) ||
-                (via != null && via.systemid === root!.systemid)
-              ? undefined
-              : via == null
-              ? (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
-                await this.getCachedCurrency(_destination.systemid)
-              ))
-              : via.systemid === root!.systemid
-              ? undefined
-              : (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
-                await this.getCachedCurrency(via.systemid)
-              )),
+              : 
+              undefined,
             price,
             viapriceinroot,
             destpriceinvia,
@@ -532,15 +536,23 @@ class VerusdRpcInterface {
           })
 
           // If gateway converter, allow converting to same currency, on current system
-          if (gateway) {
-            addConvertable(reserve, {
-              via,
-              destination: _destination,
-              price,
-              gateway: false,
-              viapriceinroot,
-              destpriceinvia
-            })
+          if (gateway || gatewayConverter) {
+            const convertableArr = convertables[reserve];
+            const existingOnChainConversion = convertableArr != null ? 
+              convertableArr.find(x => x.exportto == null) 
+              : 
+              null
+            
+            if (existingOnChainConversion == null) {
+              addConvertable(reserve, {
+                via,
+                destination: _destination,
+                price,
+                gateway: false,
+                viapriceinroot,
+                destpriceinvia
+              })
+            }
           }
         }
       }
