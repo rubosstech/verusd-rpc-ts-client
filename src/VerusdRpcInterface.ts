@@ -437,7 +437,7 @@ class VerusdRpcInterface {
         destination: fullCurrencyDefinition,
         exportto: (gateway || gatewayConverter) ? 
           (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
-            await this.getCachedCurrency(fullCurrencyDefinition.systemid)
+            await this.getCachedCurrency(gateway ? fullCurrencyDefinition.currencyid : fullCurrencyDefinition.systemid)
           ))
           : 
           undefined,
@@ -525,7 +525,7 @@ class VerusdRpcInterface {
             destination: _destination,
             exportto: (gateway || gatewayConverter) ? 
               (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
-                await this.getCachedCurrency(_destination.systemid)
+                await this.getCachedCurrency(gateway ? _destination.currencyid : _destination.systemid)
               ))
               : 
               undefined,
