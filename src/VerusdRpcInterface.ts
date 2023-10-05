@@ -276,33 +276,42 @@ class VerusdRpcInterface {
       return this.converterscache.get(key)!
     }
 
-    const response = await this.request<GetCurrencyConvertersResponse["result"]>(
-      new GetCurrencyConvertersRequest(this.chain, ...args)
-    );
+    const allCurrencies = await this.getAllCachedListCurrencies()
+    const root = (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
+      await this.getCachedCurrency(this.chain)
+    ))
+    const chainInfo = (VerusdRpcInterface.extractRpcResult<GetInfoResponse>(
+      await this.getInfo()
+    ))
 
-    if (response.result) {
-      const allCurrencies = await this.getAllCachedListCurrencies()
-      const root = (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
-        await this.getCachedCurrency(this.chain)
-      ))
+    // Try to cache locally constructed converter responses
+    for (const source of allCurrencies) {
+      const sourceDefinition = source.currencydefinition;
+      const converters: GetCurrencyConvertersResponse["result"] = [];
 
-      // Try to cache locally constructed converter responses
-      for (const source of allCurrencies) {
-        const sourceDefinition = source.currencydefinition;
-        const converters: GetCurrencyConvertersResponse["result"] = [];
+      for (const dest of allCurrencies) {
+        const destDefinition = dest.currencydefinition;
 
-        for (const dest of allCurrencies) {
-          const destDefinition = dest.currencydefinition
-          if (
-            checkFlag(destDefinition.options, IS_FRACTIONAL_FLAG) && 
-            destDefinition.currencies && 
+        if (destDefinition.currencies && 
             destDefinition.currencies.includes(sourceDefinition.currencyid) && 
-            destDefinition.bestcurrencystate
-            ) 
-          {
-            const targetReserve = destDefinition.bestcurrencystate.reservecurrencies.find(x => x.currencyid === root.currencyid);
+            dest.bestcurrencystate) {
 
-            if (targetReserve && targetReserve.weight > 0.1 && targetReserve.reserves > 1000) {
+          if (destDefinition.startblock > chainInfo.longestchain && 
+              !(destDefinition.maxpreconversion && destDefinition.maxpreconversion.reduce((sum, a) => sum + a, 0) === 0)
+          ) {
+            converters.push({
+              [destDefinition.name]: {
+                ...destDefinition,
+                bestcurrencystate: dest.bestcurrencystate
+              }
+            })
+          } else if (checkFlag(destDefinition.options, IS_FRACTIONAL_FLAG)) {
+            const targetReserve = dest.bestcurrencystate.reservecurrencies.find(x => x.currencyid === root.currencyid);
+            const systemReserve = dest.bestcurrencystate.reservecurrencies.find(
+              x => x.currencyid === this.chain
+            );
+
+            if (targetReserve && targetReserve.weight > 0.1 && systemReserve && systemReserve.reserves > 1000) {
               converters.push({
                 [destDefinition.name]: {
                   ...destDefinition,
@@ -311,23 +320,34 @@ class VerusdRpcInterface {
               })
             }
           }
+
         }
-
-        const params = [[sourceDefinition.currencyid]];
-
-        const converterResponse: RpcRequestResultSuccess<GetCurrencyConvertersResponse["result"]> = {
-          id: 0,
-          result: converters,
-          error: null
-        }
-
-        this.converterscache.set(JSON.stringify(params), converterResponse)
       }
 
-      this.converterscache.set(key, response)
+      const params = [[sourceDefinition.currencyid]];
+
+      const converterResponse: RpcRequestResultSuccess<GetCurrencyConvertersResponse["result"]> = {
+        id: 0,
+        result: converters,
+        error: null
+      }
+
+      this.converterscache.set(JSON.stringify(params), converterResponse)
     }
 
-    return response
+    if (!this.converterscache.has(key)) {
+      const response = await this.request<GetCurrencyConvertersResponse["result"]>(
+        new GetCurrencyConvertersRequest(this.chain, ...args)
+      );
+
+      if (response.result) {
+        this.converterscache.set(key, response);
+      }
+
+      return response;
+    } else {
+      return this.converterscache.get(key)!
+    }
   }
 
   private async getCurrencyConversionPathsRec(
