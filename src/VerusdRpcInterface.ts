@@ -63,6 +63,7 @@ class VerusdRpcInterface {
   private currencycache: Map<string, RpcRequestResultSuccess<GetCurrencyResponse["result"]>> = new Map();
   private converterscache: Map<string, RpcRequestResultSuccess<GetCurrencyConvertersResponse["result"]>> = new Map();
   private listcurrenciescache: Map<string, RpcRequestResultSuccess<ListCurrenciesResponse["result"]>> = new Map();
+  private infocache: RpcRequestResultSuccess<GetInfoResponse["result"]> | null = null;
 
   constructor(chain: string, baseURL: string, config?: AxiosRequestConfig) {
     this.instance = axios.create({
@@ -237,6 +238,20 @@ class VerusdRpcInterface {
     return response
   }
 
+  private async getCachedInfo(...args: ConstructorParametersAfterFirst<typeof GetInfoRequest>) {
+    if (this.infocache != null) {
+      return this.infocache!;
+    }
+
+    const response = await this.request<GetInfoResponse["result"]>(new GetInfoRequest(this.chain, ...args));
+
+    if (response.result) {
+      this.infocache = response;
+    }
+
+    return response
+  }
+
   private async getCachedListCurrencies(...args: ConstructorParametersAfterFirst<typeof ListCurrenciesRequest>) {
     const key = JSON.stringify(args);
 
@@ -266,7 +281,16 @@ class VerusdRpcInterface {
       await this.getCachedListCurrencies({ systemtype: "imported" })
     )
 
-    return [...localCurrencies, ...pbaasCurrencies, ...importedCurrencies]
+    const allCurrencies = [...localCurrencies, ...pbaasCurrencies, ...importedCurrencies]
+    const seenCurrencies: Set<string> = new Set();
+
+    return allCurrencies.filter(x => {
+      if (seenCurrencies.has(x.currencydefinition.currencyid)) return false;
+      else {
+        seenCurrencies.add(x.currencydefinition.currencyid);
+        return true;
+      }
+    })
   }
 
   private async getCachedCurrencyConverters(...args: ConstructorParametersAfterFirst<typeof GetCurrencyConvertersRequest>) {
@@ -281,7 +305,7 @@ class VerusdRpcInterface {
       await this.getCachedCurrency(this.chain)
     ))
     const chainInfo = (VerusdRpcInterface.extractRpcResult<GetInfoResponse>(
-      await this.getInfo()
+      await this.getCachedInfo()
     ))
 
     // Try to cache locally constructed converter responses
@@ -579,12 +603,19 @@ class VerusdRpcInterface {
     }
 
     if (includeVia) {
+      const chainInfo = (VerusdRpcInterface.extractRpcResult<GetInfoResponse>(
+        await this.getCachedInfo()
+      ))
+
       for (const key in convertables) {
         for (const convertablePath of convertables[key]) {
+          const started = (convertablePath.destination.startblock <= chainInfo.longestchain)
+
           if (
             checkFlag(convertablePath.destination.options, IS_FRACTIONAL_FLAG) &&
             !ignoreCurrencies.includes(key) &&
-            convertablePath.destination.currencies.includes(src.currencyid)
+            convertablePath.destination.currencies.includes(src.currencyid) && 
+            started
           ) {
             mergeConvertables(
               convertables,
@@ -688,12 +719,14 @@ class VerusdRpcInterface {
       this.currencycache.clear();
       this.listcurrenciescache.clear();
       this.converterscache.clear();
+      this.infocache = null;
   
       return result;
     } catch(e) {
       this.currencycache.clear();
       this.listcurrenciescache.clear();
       this.converterscache.clear();
+      this.infocache = null;
       
       throw e;
     }

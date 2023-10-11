@@ -21,6 +21,7 @@ declare class VerusdRpcInterface {
     private currencycache;
     private converterscache;
     private listcurrenciescache;
+    private infocache;
     constructor(chain: string, baseURL: string, config?: AxiosRequestConfig);
     request<D>(req: ApiRequest): Promise<RpcRequestResult<D>>;
     getAddressBalance(...args: ConstructorParametersAfterFirst<typeof GetAddressBalanceRequest>): Promise<RpcRequestResult<{
@@ -252,6 +253,7 @@ declare class VerusdRpcInterface {
     }, any>>;
     static extractRpcResult<D extends ApiResponse>(res: RpcRequestResult<D["result"]>): D["result"];
     private getCachedCurrency;
+    private getCachedInfo;
     private getCachedListCurrencies;
     private getAllCachedListCurrencies;
     private getCachedCurrencyConverters;
