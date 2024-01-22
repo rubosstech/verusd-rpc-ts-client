@@ -44,7 +44,7 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "axios": "0.27.2",
+    "axios": "1.6.5",
     "verus-typescript-primitives": "https://github.com/VerusCoin/verus-typescript-primitives.git"
   }
 }
