@@ -1,7 +1,7 @@
 import { AxiosInstance, AxiosRequestConfig } from "axios";
 import { GetAddressBalanceRequest, ApiRequest, GetAddressDeltasRequest, GetAddressUtxosRequest, GetBlockRequest, GetIdentityRequest, GetInfoRequest, GetOffersRequest, GetRawTransactionRequest, MakeOfferRequest, SendRawTransactionRequest, GetCurrencyRequest, GetAddressMempoolRequest, GetVdxfIdRequest, FundRawTransactionRequest, SendCurrencyRequest, GetCurrencyConvertersRequest, CurrencyDefinition, ApiResponse, ListCurrenciesRequest, EstimateConversionRequest } from "verus-typescript-primitives";
 import { ConstructorParametersAfterFirst } from "./types/ConstructorParametersAfterFirst";
-import { RpcRequestResult } from "./types/RpcRequest";
+import { RpcRequestBody, RpcRequestResult } from "./types/RpcRequest";
 declare type Convertable = {
     via?: CurrencyDefinition;
     destination: CurrencyDefinition;
@@ -15,14 +15,15 @@ declare type Convertables = {
     [key: string]: Array<Convertable>;
 };
 declare class VerusdRpcInterface {
-    instance: AxiosInstance;
+    instance?: AxiosInstance;
     currid: number;
     chain: string;
+    rpcRequestOverride?: <D>(req: RpcRequestBody<number>) => Promise<RpcRequestResult<D>>;
     private currencycache;
     private converterscache;
     private listcurrenciescache;
     private infocache;
-    constructor(chain: string, baseURL: string, config?: AxiosRequestConfig);
+    constructor(chain: string, baseURL: string, config?: AxiosRequestConfig, rpcRequest?: <D>(req: RpcRequestBody<number>) => Promise<RpcRequestResult<D>>);
     request<D>(req: ApiRequest): Promise<RpcRequestResult<D>>;
     getAddressBalance(...args: ConstructorParametersAfterFirst<typeof GetAddressBalanceRequest>): Promise<RpcRequestResult<{
         balance: number;

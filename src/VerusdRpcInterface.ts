@@ -56,23 +56,28 @@ type Convertable = {
 type Convertables = { [key: string]: Array<Convertable> }
 
 class VerusdRpcInterface {
-  instance: AxiosInstance;
+  instance?: AxiosInstance;
   currid: number;
   chain: string;
+
+  rpcRequestOverride?: <D>(req: RpcRequestBody<number>) => Promise<RpcRequestResult<D>>;
 
   private currencycache: Map<string, RpcRequestResultSuccess<GetCurrencyResponse["result"]>> = new Map();
   private converterscache: Map<string, RpcRequestResultSuccess<GetCurrencyConvertersResponse["result"]>> = new Map();
   private listcurrenciescache: Map<string, RpcRequestResultSuccess<ListCurrenciesResponse["result"]>> = new Map();
   private infocache: RpcRequestResultSuccess<GetInfoResponse["result"]> | null = null;
 
-  constructor(chain: string, baseURL: string, config?: AxiosRequestConfig) {
-    this.instance = axios.create({
-      baseURL,
-      headers: {
-        "Content-type": "application/json",
-      },
-      ...config,
-    });
+  constructor(chain: string, baseURL: string, config?: AxiosRequestConfig, rpcRequest?: <D>(req: RpcRequestBody<number>) => Promise<RpcRequestResult<D>>) {
+    if (rpcRequest) this.rpcRequestOverride = rpcRequest;
+    else {
+      this.instance = axios.create({
+        baseURL,
+        headers: {
+          "Content-type": "application/json",
+        },
+        ...config,
+      });
+    }
 
     this.currid = 0;
     this.chain = chain;
@@ -89,8 +94,10 @@ class VerusdRpcInterface {
       method: req.cmd,
     };
 
+    if (this.rpcRequestOverride) return this.rpcRequestOverride(body);
+ 
     try {
-      const res: AxiosResponse = await this.instance.post("/", body);
+      const res: AxiosResponse = await this.instance!.post("/", body);
 
       if (res.status != 200) {
         const error: RpcRequestResultError = {
