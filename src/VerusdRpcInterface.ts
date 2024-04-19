@@ -389,6 +389,10 @@ class VerusdRpcInterface {
     via?: CurrencyDefinition, 
     root?: CurrencyDefinition) 
   {
+    const currChainDefinition = (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
+      await this.getCachedCurrency(this.chain)
+    ))
+
     const fractionalSource = checkFlag(src.options, IS_FRACTIONAL_FLAG);
     const paths = VerusdRpcInterface.extractRpcResult<GetCurrencyConvertersResponse>(
       await this.getCachedCurrencyConverters(dest == null ? [src.currencyid] : [src.currencyid, dest!.currencyid])
@@ -479,17 +483,25 @@ class VerusdRpcInterface {
 
       const gateway = checkFlag(fullCurrencyDefinition.options, IS_GATEWAY_FLAG);
 
-      const gatewayConverter = fullCurrencyDefinition.systemid !== this.chain && 
-                      (checkFlag(fullCurrencyDefinition.options, IS_GATEWAY_CONVERTER_FLAG) || 
-                      (via != null && checkFlag(via.options, IS_GATEWAY_CONVERTER_FLAG)))
+      const gatewayConverter = (
+        checkFlag(fullCurrencyDefinition.options, IS_GATEWAY_CONVERTER_FLAG) || 
+        checkFlag(src.options, IS_GATEWAY_CONVERTER_FLAG) ||
+        (via != null && checkFlag(via.options, IS_GATEWAY_CONVERTER_FLAG)));
+
+      const fractionalConverter = via ? via : fullCurrencyDefinition;
 
       addConvertable(fullCurrencyDefinition.currencyid, {
         via,
         destination: fullCurrencyDefinition,
         exportto: (gateway || gatewayConverter) ? 
           (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
-            await this.getCachedCurrency(gateway ? fullCurrencyDefinition.currencyid : fullCurrencyDefinition.systemid)
-          ))
+            await this.getCachedCurrency(
+              gateway ? 
+                fullCurrencyDefinition.currencyid 
+                : 
+                fractionalConverter.parent === this.chain ? fractionalConverter.launchsystemid : fractionalConverter.parent)
+            )
+          )
           : 
           undefined,
         price,
@@ -567,16 +579,23 @@ class VerusdRpcInterface {
 
           const gateway = checkFlag(_destination.options, IS_GATEWAY_FLAG);
 
-          const gatewayConverter = _destination.systemid !== this.chain &&  
-                          (checkFlag(_destination.options, IS_GATEWAY_CONVERTER_FLAG) || 
-                          (via != null && checkFlag(via.options, IS_GATEWAY_CONVERTER_FLAG)))
+          const gatewayConverter = (
+            checkFlag(_destination.options, IS_GATEWAY_CONVERTER_FLAG) || 
+            checkFlag(src.options, IS_GATEWAY_CONVERTER_FLAG) ||
+            (via != null && checkFlag(via.options, IS_GATEWAY_CONVERTER_FLAG)));
+          
+          const fractionalConverter = via ? via : src;
 
           addConvertable(reserve, {
             via,
             destination: _destination,
             exportto: (gateway || gatewayConverter) ? 
               (VerusdRpcInterface.extractRpcResult<GetCurrencyResponse>(
-                await this.getCachedCurrency(gateway ? _destination.currencyid : _destination.systemid)
+                await this.getCachedCurrency(gateway ? 
+                  _destination.currencyid 
+                  : 
+                  fractionalConverter.parent === this.chain ? fractionalConverter.launchsystemid : fractionalConverter.parent
+                )
               ))
               : 
               undefined,
@@ -616,7 +635,11 @@ class VerusdRpcInterface {
 
       for (const key in convertables) {
         for (const convertablePath of convertables[key]) {
-          const started = (convertablePath.destination.startblock <= chainInfo.longestchain)
+          const started = (
+            (convertablePath.destination.startblock <= chainInfo.longestchain) 
+            || 
+            (convertablePath.destination.launchsystemid !== chainInfo.chainid)
+          )
 
           if (
             checkFlag(convertablePath.destination.options, IS_FRACTIONAL_FLAG) &&
@@ -638,6 +661,49 @@ class VerusdRpcInterface {
           }
         }       
       }
+    }
+
+    // Rules:
+    // The systemid of the fractional currency determines if exportto must be present or not.
+    // If using via, the via is always the fractional currency.
+    // If not using via, check both source and dest for fractional flag.
+    for (const key in convertables) {
+      const convertableArr = convertables[key];
+
+      convertables[key] = convertableArr.filter(x => {
+        const convertable = x as {
+          via?: CurrencyDefinition;
+          destination: CurrencyDefinition;
+          price: number;
+          gateway: boolean;
+          viapriceinroot?: number;
+          destpriceinvia?: number;
+          exportto?: CurrencyDefinition;
+        };
+
+        let fractionalConverter: CurrencyDefinition | undefined;
+
+        if (convertable.via) fractionalConverter = convertable.via;
+        else {
+          const fractionalDest = checkFlag(convertable.destination.options, IS_FRACTIONAL_FLAG);
+
+          if (fractionalSource && !fractionalDest) fractionalConverter = src;
+          else if (!fractionalSource && fractionalDest) fractionalConverter = convertable.destination;
+          else if (src.currencies && convertable.destination.currencies) {
+            if (src.currencies.includes(convertable.destination.currencyid)) fractionalConverter = src;
+            else fractionalConverter = convertable.destination;
+          } else return false;
+        }
+
+        if ((fractionalConverter!.systemid !== this.chain) && (convertable.exportto == null || convertable.exportto.currencyid !== fractionalConverter!.systemid)) return false;
+        else if (convertable.exportto != null) {
+          // Make sure you only export to currencies that can see the chain you're on
+          const seeByLaunch = convertable.exportto.launchsystemid === currChainDefinition.currencyid || currChainDefinition.launchsystemid === convertable.exportto.currencyid;
+          const seeByParent = convertable.exportto.parent === currChainDefinition.currencyid || currChainDefinition.parent === convertable.exportto.currencyid;
+
+          return seeByLaunch || seeByParent;
+        } else return true;
+      });
     }
 
     return convertables;

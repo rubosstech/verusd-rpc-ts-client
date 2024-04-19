@@ -157,6 +157,8 @@ declare class VerusdRpcInterface {
         decay: string;
         endsubsidy: string;
         veruspos: number;
+        chainid?: string | undefined;
+        notarychainid?: string | undefined;
     }, any>>;
     getOffers(...args: ConstructorParametersAfterFirst<typeof GetOffersRequest>): Promise<RpcRequestResult<import("verus-typescript-primitives/dist/offers/OfferList").OfferList, any>>;
     getRawTransaction(...args: ConstructorParametersAfterFirst<typeof GetRawTransactionRequest>): Promise<RpcRequestResult<string | import("verus-typescript-primitives/dist/transaction/RawTransaction").RawTransaction, any>>;
