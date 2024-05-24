@@ -34,9 +34,9 @@ declare class VerusdRpcInterface {
         currencyreceived: {
             [key: string]: number;
         };
-        currencynames: {
+        currencynames?: {
             [key: string]: string;
-        };
+        } | undefined;
     }, any>>;
     getAddressDeltas(...args: ConstructorParametersAfterFirst<typeof GetAddressDeltasRequest>): Promise<RpcRequestResult<{
         satoshis: number;
@@ -87,12 +87,12 @@ declare class VerusdRpcInterface {
         txid: string;
         outputIndex: number;
         script: string;
-        currencyvalues: {
-            [key: string]: number;
-        };
-        currencynames: {
-            [key: string]: string;
-        };
+        currencyvalues?: {
+            [key: string]: number | undefined;
+        } | undefined;
+        currencynames?: {
+            [key: string]: string | undefined;
+        } | undefined;
         satoshis: number;
         height: number;
         isspendable: number;
